@@ -1,9 +1,10 @@
-package Fitch;
-
 import java.util.Stack;
 
 public class ancestorGen {
 
+	public static Stack<String> ancestor = new Stack<String>();
+
+// Forward Pass
 public static String[] ancestorF(String[] a, String[] b){
 
 String seq2[] = a;
@@ -12,11 +13,11 @@ String seq1[] = b;
 int count=0;
 String[] setAncestor=null;
 if(a.length>=b.length){
-	setAncestor = new String[seq1.length];
+	setAncestor = new String[25];
 	count=b.length;
 }
 else{
-	setAncestor = new String[seq2.length];
+	setAncestor = new String[25];
 	count=a.length;
 }
 
@@ -36,50 +37,34 @@ if(setAncestor[i] == "")
 setAncestor[i]= seq1[i] + seq2[i];
 
 }
-
+for(int i=setAncestor.length;i<25; i++){
+	setAncestor[i] = "-";
+}
 return setAncestor;
 }
 
-public static Stack<String> ancestorB(Node ancesF){
-	Node node = ancesF.lc;
-	Node node2compare = ancesF;
-	Node nodeR=ancesF.rc;
-	Node node2compareR=ancesF;
-	String ancestor = "";
-	int flag=0;
-	Stack<String> allAncestor = new Stack<String>();
-	//Left Sub-tree
-	while(node.ancestorSet!=null){
-		ancestor = ancestorSeqGen(node.ancestorSet, node2compare.ancestorSet);
-		if(flag==0){
-			allAncestor.push(ancestor);
-			flag=1;
-		}
-		allAncestor.push(ancestor);
-		node.ancestor = ancestor;
-		node2compare=node;
-		node=node.lc;
-	}
-	//Right sub-tree
-	while(nodeR.ancestorSet!=null){
-		ancestor = ancestorSeqGen(nodeR.ancestorSet, node2compareR.ancestorSet);
-		if(flag==0){
-			allAncestor.push(ancestor);
-			flag =1;
-		}
-		allAncestor.push(ancestor);
-		nodeR.ancestor = ancestor;
-		node2compareR=nodeR;
-		nodeR=nodeR.rc;
-	}
+public Stack ancestorB(Node node, Node node2){
 
-	return allAncestor;
-	
+	String anc="";
+
+	if(node!=null){
+		ancestorB(node.rc,node2);
+		ancestorB(node.lc,node2);
+		if(node.data==null && node.prev!=null){
+			
+			anc = ancestorSeqGen(node.ancestorSet, node.prev.ancestorSet);
+			System.out.println(anc);
+			node.data = anc;
+			ancestor.push(anc);
+		}
+		
+	}
+	return ancestor;
 }
 // 'a' is the child sequence of 'b'
 public static String ancestorSeqGen(String[] a, String[] b){
 	String ancestor="";
-	for(int i=0;i<20;i++){
+	for(int i=0;i<25;i++){
 		if(a[i].contains("A") && b[i].contains("A") ){
 			ancestor = ancestor + 'A';
 		} else{

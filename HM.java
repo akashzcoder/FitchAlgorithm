@@ -1,14 +1,19 @@
-package Fitch;
-
-import Fitch.Node; 
-import java.util.Stack;
+import ParScore.Node; 
+import ParScore.ancestorGen;
+import ParScore.Score;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 public class HM {
-	
-	public static void fitch(Hashtable ht, String tree){
+    
+		public static void fitch(Hashtable ht, String tree){
 		Stack stk = new Stack();
-		Stack ances = new Stack();
+		
 		String speciesName="";
 		String s1[]=null;
 		String[] s2=null;
@@ -21,16 +26,18 @@ public class HM {
 				speciesName = speciesName + tree.charAt(i);
 			}
 			if((tree.charAt(i) == ',' && tree.charAt(i-1)!=')') || (tree.charAt(i) == ')' && tree.charAt(i-1) != ')')){
-				if(tree.charAt(i) == ',' && tree.charAt(i-1)!=')'){
-					
-					Node obj = new Node(speciesName, (String)ht.get(speciesName), null, null,null,null);
+
+					String dd=(String)ht.get(speciesName);
+                // 25 is the length of the sequence, make it dynamic if u have to
+					for(int i2=dd.length();i2<25;i2++){
+						dd=dd+'-';
+					}
+					Node obj = new Node(speciesName, dd, null, null,null,null,null);
 					stk.push(obj);
-				}
-				
-				if(tree.charAt(i) == ')' && tree.charAt(i-1) != ')'){
-					
-					Node obj = new Node(speciesName, (String)ht.get(speciesName), null, null,null,null);
-					stk.push(obj);
+					speciesName = "";
+
+			}
+				if(tree.charAt(i) == ')' ){
 					Node a = (Node) stk.pop();
 					Node b = (Node) stk.pop();
 					if(a.data != null && b.data!=null){
@@ -63,17 +70,19 @@ public class HM {
 							}
 						}
 					}
-					
 					String[] s3= obj2.ancestorF(s1, s2);
-					obj3 = new Node(null, null, a, b, s3,null);
+					obj3 = new Node(null, null, a, b,null, s3,null);
+					a.prev=obj3;
+					b.prev=obj3;
 					stk.push(obj3);
 				}
-				speciesName = "";
-				
-			}// end of if
+
 		}// end of for loop
-		compAnc = obj2.ancestorB(obj3);
-		System.out.println(compAnc.size());
+		ancestorGen ancestorSeq = new ancestorGen();
+		Stack ances = new Stack();
+		ances = ancestorSeq.ancestorB(obj3,obj3);
+		//parScore(ht, tree, ances); 
+		ances.clear();
 		
 	}// end of method
-}// end of class
+	}// end of class
